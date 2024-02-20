@@ -9,7 +9,7 @@ export const productoVista=(req, res)=>{
 //crud
 export const productoAll=async(req, res)=>{
   try {
-    const listaProducto=await Producto.findAll();
+    const listaProducto=await Producto.find().populate("clienteId");
     res.status(200).json({
       message:"se obtuvo con exito la lista de producto",
     listaProducto
@@ -24,11 +24,7 @@ export const productoAll=async(req, res)=>{
 export const productoOne=async(req, res)=>{
   try {
     const {id}= req.params; 
-    const unProducto=await Producto.findOne({
-      where:{
-        id
-      }
-    })
+    const unProducto=await Producto.findById(id)
     return res.status(200).json({
       message:"se pudo obtener con exito el producto",
       unProducto
@@ -43,10 +39,10 @@ export const productoOne=async(req, res)=>{
 export const productoUpdate=async(req, res)=>{
   try {
     const {id}= req.params;
-    const productoActualizado=await Producto.findByPk(id);
-    await productoActualizado.update(req.body)
+    const productoActualizado=await Producto.findByIdAndUpdate(id, req.body);
     return res.status(200).json({
-      message:"Se actualizo con exito el producto"
+      message:"Se actualizo con exito el producto",
+      productoActualizado
     })
   } catch (error) {
     return res.status(500).json({
@@ -63,10 +59,10 @@ export const productoDelete=async(req, res)=>{
         message:"No se pudo encontrar el id del producto"
       })
     }
-    const elimnarProducto=await Producto.findByPk(id);
-    await elimnarProducto.destroy(req.body);
+    const elimnarProducto=await Producto.findOneAndUpdate({_id:id});
     return res.status(200).json({
-      message:"Se elimino con exito el producto"
+      message:"Se elimino con exito el producto",
+      elimnarProducto
     })
   } catch (error) {
     return res.status(500).json({

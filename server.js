@@ -6,7 +6,7 @@ import path,{dirname} from "path";
 import { fileURLToPath } from "url";
 
 export const app = express();
-export const port = process.env.PORT || 3000;
+export const port = process.env.DB_PORT || 3000;
 const rutaActual=dirname(fileURLToPath(import.meta.url))
 
 // Middlewares

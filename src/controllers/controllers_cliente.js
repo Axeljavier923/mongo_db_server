@@ -8,11 +8,7 @@ import { Producto } from "../models/model_producto.js";
 //crud
 export const clientAll = async (req, res) => {
     try {
-        const listaClient = await Cliente.findAll({
-            include:{
-                model:Producto
-            }
-        });
+        const listaClient = await Cliente.find().populate("empleadoId")
 
         return res.status(200).json(listaClient);
     } catch (error) {
@@ -25,15 +21,16 @@ export const clientAll = async (req, res) => {
 
 export const clientOne=async(req, res)=>{
     try {
-        const {id} = req.params;
-        const unClient=await Cliente.findOne(
-            {
-                where: {
-                  id,
-                },
-                include: Producto
-            })
-        res.status(200).json(unClient);
+        const {_id} = req.params;
+        const unCliente = await Cliente.findById(_id).populate('productos'); 
+
+        if (!unCliente) {
+          return res.status(404).json({
+            message: "Cliente no encontrado"
+          });
+        }
+    
+        return res.status(200).json(clienteDeEmpleado);
     } catch (error) {
         console.log("Hubo un error al encontrar el cliente" + error)
         return res.status(500).json({
@@ -71,11 +68,11 @@ export const productoNuevo = async (req, res) => {
 
 export const clientEdit=async(req, res)=>{
     try {
-        const {id} = req.params;
-        const updateClient=await Cliente.findByPk(id);
-        await updateClient.update(req.body);
+        const {_id} = req.params;
+        const updateClient=await Cliente.findByIdAndUpdate(_id, req.body);
         return res.status(200).json({
-            message:"se edito el cliente"
+            message:"se edito el cliente",
+            updateClient
         })
     } catch (error) {
         console.log("error al editar un cliente");
@@ -94,10 +91,10 @@ export const clientDelete=async(req, res)=>{
                 message:"no se a enviado el id"
             })
         }
-        const deleteClient=await Cliente.findByPk(id);
-        await deleteClient.destroy({estado:false})
+        const deleteClient=await Cliente.findOneAndDelete({_id:id});
         return res.status(200).json({
             message:"se elemino el cliente correctamente",
+            deleteClient
         })
     } catch (error) {
         console.log("no se elimino el cliente");

@@ -1,39 +1,27 @@
-import { sequelize, DataTypes } from "../database/db.js";
+import mongoose from "mongoose";
 
-export const Producto=sequelize.define(
-    "producto",{
-        id:{
-            type:DataTypes.INTEGER,
-            primaryKey:true,
-            autoIncrement:true,
-        },
-        nombre_producto:{
-            type:DataTypes.STRING,
-            allowNull:false,
-        },
-        cantidad:{
-            type:DataTypes.INTEGER,
-            allowNull:false,
-        },
-        precio:{
-            type:DataTypes.INTEGER,
-            allowNull:false,
-        },
-        clienteId: { 
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-              model: 'clientes',
-              key: 'id',
-            }
-        },
-    },{
-        timestamps:true,
-        tableName:"producto"
-    }
-);
+const productoSchema = new mongoose.Schema({
+  nombre_producto: {
+    type: String,
+    required: true
+  },
+  cantidad: {
+    type: Number,
+    required: true
+  },
+  precio: {
+    type: Number,
+    required: true
+  },
+  clienteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cliente', 
+    required: true
+  }
+}, {
+  timestamps: true,
+  collection: "productos" 
+});
 
-// Producto.sync({force:false}).then(()=>{
-//     console.log("Se creo la tabla de producto")
-// })
+export const Producto = mongoose.model("Producto", productoSchema);
 

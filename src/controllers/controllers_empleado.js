@@ -9,25 +9,21 @@ export const empleadoVista=(req, res)=>{
 //crud
 export const empleadoAll=async(req, res)=>{
     try {
-    const listaEmpleado=await Empleado.findAll({
-        include: Cliente
-    })
-    console.log("Lista de empleados:" + listaEmpleado)
-    return res.status(201).json(listaEmpleado)
-    } catch (error) {
-        console.log("ah ocurrido un error al obtener la lista de clientes " + error)
-    }
+        const listaEmpleados = await Empleado.find({}).populate('cliente');
+        return res.status(200).json(listaEmpleados);
+      } catch (error) {
+        console.log("Hubo un error al obtener la lista de empleados", error);
+        return res.status(500).json({
+          message: "No se pudo obtener la lista de empleados"
+        });
+      }
 }
 
 export const empleadoOne=async(req, res)=>{
     try {
         const {id}=req.params;
-        const unEmpleado=await Empleado.findOne({
-            where:{
-                id
-            },
-            include: Cliente
-        });
+        const unEmpleado=await Empleado.findById(id).populate("clientes")
+        
         res.status(200).json(unEmpleado)
     } catch (error) {
         res.status(500).json({
@@ -66,7 +62,7 @@ export const clientNuevo=async(req, res)=>{
             message:"se creo el cliente"
     })
     } catch (error) {
-        console.log("error al crear el cliente");
+        console.log("error al crear el cliente" + error);
         return res.status(500).json({
             message:"no se pudo crear el cliente",
         })
@@ -76,10 +72,11 @@ export const clientNuevo=async(req, res)=>{
 export const empleadoUpdate=async(req, res)=>{
     try {
         const{id}=req.params;
-        const updateClient=await Empleado.findByPk(id);
-        await updateClient.update(req.body)
+        console.log(id);
+        const updateClient=await Empleado.findByIdAndUpdate(id, req.body)
         return res.status(200).json({
             message:"Se actualizo correctamente el cliente",
+            updateClient
         })
     } catch (error) {
         return res.status(500).json({
@@ -90,20 +87,31 @@ export const empleadoUpdate=async(req, res)=>{
 
 export const empleadoDelete=async(req, res)=>{
     try {
-        const {id}=req.params;
-        if (!id){
-            return res.status(400).json({
-                message:"no se pudo encontrar el id"
-            })
+        const { id } = req.params;
+    
+        if (!id) {
+          return res.status(400).json({
+            message: "No se proporcionó el ID"
+          });
         }
-        const deleteClient=await Empleado.findByPk(id)
-        await deleteClient.destroy({estado:true});
+    
+        const deletedEmployee = await Empleado.findOneAndDelete({ _id: id });
+    
+        if (!deletedEmployee) {
+          return res.status(404).json({
+            message: "Empleado no encontrado"
+          });
+        }
+    
         return res.status(200).json({
-            message:"Se elimino correctamente el empleado"
-        })
-    } catch (error) {
+          message: "Se eliminó correctamente el empleado",
+          deletedEmployee
+        });
+      } catch (error) {
+        console.error("Hubo un error al eliminar el empleado:", error);
         return res.status(500).json({
-            message:"no se elimino correctamente el empleado"
-        })
-    }
+          message: "No se pudo eliminar correctamente el empleado",
+          error: error.message
+        });
+      }
 }

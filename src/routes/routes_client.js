@@ -10,7 +10,7 @@ routes_cliente.get("/vista", vistaCliente)
 
 //crud
   routes_cliente.get("/",  clientAll)
-  routes_cliente.get("/:id", clientOne)
+  routes_cliente.get("/:_id", clientOne)
   routes_cliente.post("/:clienteId/producto", createSchemaProducto , validator ,productoNuevo);
-  routes_cliente.put("/:id", clientEdit)
+  routes_cliente.put("/:_id", clientEdit)
   routes_cliente.delete("/:id", clientDelete)

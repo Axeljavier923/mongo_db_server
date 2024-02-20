@@ -1,44 +1,31 @@
-import { sequelize, DataTypes } from "../database/db.js";
+import mongoose from "mongoose";
 
-export const Cliente=sequelize.define(
-    "cliente",{
-        id:{
-            type:DataTypes.INTEGER,
-            primaryKey:true,
-            autoIncrement:true,
-        },
-        nombre_completo:{
-            type:DataTypes.STRING,
-            allowNull: false,
-        },
-        genero:{
-            type:DataTypes.STRING,
-            allowNull:false,
-        },
-        edad:{
-            type:DataTypes.INTEGER,
-            allowNull:false,
-        },
-        empleadoId: { 
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-              model: 'empleados',
-              key: 'id',
-            }
-        },
-    },
-    {
-        timestamps:true,
-        tableName: "clientes",
-    }
-);
+const clienteSchema = new mongoose.Schema({
+  nombre_completo: {
+    type: String,
+    required: true
+  },
+  genero: {
+    type: String,
+    required: true
+  },
+  edad: {
+    type: Number,
+    required: true
+  },
+  empleadoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Empleado',
+    required: false
+  },
+  productos: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Producto',
+    required: false
+  },
+}, {
+  timestamps: true,
+  collection: "clientes" 
+});
 
-//crear tabla
-
-// Cliente.sync({force:false}).then(()=>{
-//     console.log("Se a creado la tabla de cliente")
-// }).catch(()=>{
-//     console.log("no se pudo crear la tabla de cliente")
-// })
-
+export const Cliente = mongoose.model("Cliente", clienteSchema);

@@ -1,5 +1,5 @@
 import {getUserById, getAllUsers, getOneUser, EditOneUsers, 
-  RegisterOneUsers, DeleteOneUsers, LoginOneUsers } from '../models/model_auth.js'
+  RegisterOneUsers, DeleteOneUsers, LoginOneUsers, Auth } from '../models/model_auth.js'
 import {hashPassword, comparePassword} from "../helpers/hash.js";
 import {generateToken, verifyToken} from "../helpers/jsonWenToken.js"
 
@@ -29,7 +29,7 @@ export const ctrlGetUserInfoByToken = async (req, res) => {
 
       res.status(200).json(user);
     } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
+      if (error) {
         console.error('Error al verificar el token:', error.message);
         return res.status(401).json({ message: 'Token inválido' });
       }
@@ -89,6 +89,7 @@ export const ctrlLoginUser = async (req, res) => {
     const { id } = req.params;
     try {
       const updateUser = await EditOneUsers(id)
+      console.log(updateUser)
   
       if (!updateUser) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -99,7 +100,7 @@ export const ctrlLoginUser = async (req, res) => {
         req.body.password = hashedPassword;
       }
   
-      await updateUser.update(req.body);
+      await Auth.findByIdAndUpdate(id, req.body, { new: true });
   
       res.status(200).json({
         message: 'El usuario logeado se ha actualizado:',
@@ -151,7 +152,7 @@ export const ctrlLoginUser = async (req, res) => {
             })
         }
         const deleteClient=await DeleteOneUsers(id)
-        await deleteClient.destroy({estado:true});
+        await Auth.findByIdAndDelete(deleteClient)
         return res.status(200).json({
             message:"Se elimino correctamente el usuario:",
             deleteClient
